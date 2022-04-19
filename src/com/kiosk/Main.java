@@ -20,15 +20,26 @@ package com.kiosk;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static com.kiosk.Main.studentDB;
+
 public class Main {
 
     static ArrayList<Book> currentBookInventory = new ArrayList<>();
+    static ArrayList<Student> studentDB = new ArrayList<>();
 
     public static void main(String[] args) {
 	    System.out.println("Welcome to the CSU Libray Kiosk");
 
-        /** Making a student for testing purposes; will need to import a database */
-        Student student = new Student(12345, "Jordan", "Doe", "password123", false);
+        /** Making a student "DB" for testing purposes; will need to import a database */
+
+        Student student1 = new Student(900123456, "Jordan", "Doe", "password123", false);
+        Student student2 = new Student(900494494, "Tom", "Henderson", "secret", false);
+        Student student3 = new Student(900111111, "Wont", "Smith", "crock", false);
+
+        studentDB.add(student1);
+        studentDB.add(student2);
+        studentDB.add(student3);
+
 
         /** Adding books manually for testing purposes */
         addBookToInventory("The Cat in the Hat", 1, "Dr. Seuss", "978-0-7172-6059-1", "Children");
@@ -42,37 +53,45 @@ public class Main {
 
     public static void login(){
         boolean loggedIn = false;
-
-        /**
-         * Assuming that the user is a student for now. Will need to have a
-         * separate login for LibraryStaff.
-         **/
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Please Enter Your Student ID: ");
-        String user = scanner.nextLine();
-
-        /**
-         * Scanning the database for entered student ID to see if it exists.
-         * If it matches a valid ID, find the password and compare to entered
-         * password.
-         */
-
-        Student student = new Student(Integer.parseInt(user), "Unknown", "Unknown", "password123", false);
-
         while (loggedIn == false) {
+            /**
+             * Assuming that the user is a student for now. Will need to have a
+             * separate login for LibraryStaff.
+             **/
+
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Please Enter Your Student ID: ");
+            String user = scanner.nextLine();
+
+            /**
+             * Scanning the database for entered student ID to see if it exists.
+             * If it matches a valid ID, find the password and compare to entered
+             * password.
+             */
+            Student student = null;
+            student = Student.findStudent(Integer.parseInt(user));
+
+
+
             System.out.print("Please enter your password: ");
             String pass = scanner.nextLine();
-            if (pass.equals(student.password)) {
-                loggedIn = true;
 
-                //Welcome Message
-                System.out.println(" ");
-                System.out.println("Welcome, "+student.Fname+" "+student.Lname+"!");
-                kioskButtonOptions(student);
 
-            } else {
-                System.out.println("Incorrect password. Check for errors and try again.");
+            try {
+                String validPW = student.password;
+                if (pass.equals(validPW)) {
+                    loggedIn = true;
+
+                    //Welcome Message
+                    System.out.println(" ");
+                    System.out.println("Welcome, " + student.Fname + " " + student.Lname + "!");
+                    kioskButtonOptions(student);
+
+                } else {
+                    System.out.println("Incorrect password. Check for errors and try again.");
+                }
+            } catch (NullPointerException e) {
+                System.out.println("The entered ID is invalid or does not exist. Please check your spelling and try again."+'\n');
             }
         }
     }
@@ -120,7 +139,7 @@ public class Main {
                     searchBookByTitleAuthor(student);
                     break;
                 case "3":
-                    System.out.println("Return Borrowed Book: TO-DO");
+                    System.out.println("Selected: Return Borrowed Book");
                     returnBook(student);
                     break;
                 case "4":
@@ -160,7 +179,7 @@ public class Main {
      * @param category
      */
     public static void addBookToInventory(String bookTitle, int BookID, String Author, String ISNnum, String category){
-        Book newBook = new Book(bookTitle, BookID, Author, ISNnum, category, false);
+        Book newBook = new Book(bookTitle, BookID, Author, ISNnum, category, false, 0);
         //Load Book into DB inventory here
         //TO-DO
 
@@ -312,7 +331,7 @@ public class Main {
 
                     switch (input){
                         case "y":
-                            reserveBook(desired_book);
+                            reserveBook(student, desired_book);
                             break;
                         case "n":
                             System.out.println("Going back to Main Menu...");
@@ -329,8 +348,15 @@ public class Main {
         }
     }
 
-    public static void reserveBook(Book book){
+    public static void reserveBook(Student student, Book book){
         System.out.println("Ok, reserving book..."); //TO-DO
+        if (!(book.reservedBy == 0)) {
+            System.out.println("This book has already been reserved. Check back another time.");
+        } else {
+            book.reservedBy = student.getID();
+            System.out.println("You have successfully reserved this book. We will notify you when it is available.");
+
+        }
     }
 
     public static void returnBook(Student student){
@@ -366,6 +392,10 @@ public class Main {
                 for (int j = 0; j < currentBookInventory.size(); j++){
                     if (currentBookInventory.get(j).BookID == queryList.get(option).BookID){
                         currentBookInventory.get(j).isCheckedOut = false;
+
+                        //Alert person who reserved and change reservedBy value to default value
+                        reserveNotif(currentBookInventory.get(j).reservedBy);
+                        currentBookInventory.get(j).reservedBy = 0;
                     }
                 }
 
@@ -375,8 +405,6 @@ public class Main {
                         student.studentInventory.remove(k);
                     }
                 }
-
-
 
                 System.out.println("Successful!");
             }
@@ -404,6 +432,17 @@ public class Main {
         //Create Book and Add to Inventory
         addBookToInventory(title, id, author, ISNnum, category);
         System.out.println('\n'+"Donation successful!");
+    }
+
+    public static void reserveNotif(int studentID){
+
+        if (!(studentID == 0)) {
+            //Find matching student by ID
+            Student student = Student.findStudent(studentID);
+
+            //This represents the message that will be sent out to the user, assuming we add an email functionality
+            System.out.println("Sending book availability notification email to " + student.getFullName()+"...");
+        }
     }
 
 } // End of Main
@@ -482,6 +521,24 @@ class Student extends UnivMember {
         return studentInventory;
     }
 
+    public String getFullName() {
+
+        return (Fname + " " + Lname);
+    }
+
+    public int getID() {
+        return id;
+    }
+
+    public static Student findStudent(int id){
+        for (Student stud : studentDB) {
+            if (stud.getId() == id) {
+                return stud; //gotcha!
+            }
+        }
+        return null; // Student not found.
+    }
+
 }
 
 class LibraryStaff extends UnivMember {
@@ -499,14 +556,16 @@ class Book {
     String ISNnum;
     String category;
     boolean isCheckedOut;
+    int reservedBy;
 
-    public Book(String bookTitle, int BookID, String Author, String ISNnum, String category, boolean isCheckedOut){
+    public Book(String bookTitle, int BookID, String Author, String ISNnum, String category, boolean isCheckedOut,int reservedBy){
         this.bookTitle = bookTitle;
         this.BookID = BookID;
         this.Author = Author;
         this.ISNnum = ISNnum;
         this.category = category;
         this.isCheckedOut = isCheckedOut;
+        this.reservedBy = reservedBy;
     }
 
     public String getBookTitle() {
@@ -533,4 +592,7 @@ class Book {
         return isCheckedOut;
     }
 
+    public int getReservedBy() {
+        return reservedBy;
+    }
 }
