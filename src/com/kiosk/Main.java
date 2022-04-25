@@ -27,6 +27,9 @@ public class Main {
     static ArrayList<Book> currentBookInventory = new ArrayList<>();
     static ArrayList<Student> studentDB = new ArrayList<>();
 
+    /** Declaring administrator*/
+    static LibraryStaff staff;
+
     public static void main(String[] args) {
 	    System.out.println("Welcome to the CSU Libray Kiosk");
 
@@ -44,6 +47,8 @@ public class Main {
         /** Adding books manually for testing purposes */
         addBookToInventory("The Cat in the Hat", 1, "Dr. Seuss", "978-0-7172-6059-1", "Children");
         addBookToInventory("Computer Science: An Overview", 2, "Gleen Brookshear, Dennis Brylow", "9780134875460", "Computer Science");
+        addBookToInventory("Random Math Book", 3, "Denzell Moss", "938922283", "Math");
+
 
         /**Logging into the Kiosk*/
        login();
@@ -85,7 +90,14 @@ public class Main {
                     //Welcome Message
                     System.out.println(" ");
                     System.out.println("Welcome, " + student.Fname + " " + student.Lname + "!");
-                    kioskButtonOptions(student);
+
+                    if (student.isStaff() == false) {
+                        kioskButtonOptions(student);
+                    } else if (student.isStaff == true) {
+                        staff = new LibraryStaff(student.id, student.Fname, student.Lname, student.password, true);
+                        System.out.println("Logging into Administrative Portal...");
+                        adminOptions();
+                    }
 
                 } else {
                     System.out.println("Incorrect password. Check for errors and try again.");
@@ -100,7 +112,6 @@ public class Main {
         System.out.println("Logout successful."+'\n');
         System.out.println("Welcome to the CSU Libray Kiosk");
         login();
-        //Method to log out TO-DO
     }
 
     /**
@@ -170,6 +181,10 @@ public class Main {
 
     }
 
+    public static void adminOptions(){
+
+    }
+
     /**
      * Adds a book to the DB Inventory and the local inventory ArrayList
      * @param bookTitle
@@ -179,7 +194,7 @@ public class Main {
      * @param category
      */
     public static void addBookToInventory(String bookTitle, int BookID, String Author, String ISNnum, String category){
-        Book newBook = new Book(bookTitle, BookID, Author, ISNnum, category, false, 0);
+        Book newBook = new Book(bookTitle, BookID, Author, ISNnum, category, 0, 0);
         //Load Book into DB inventory here
         //TO-DO
 
@@ -190,7 +205,7 @@ public class Main {
     /**A method to tag whether a book is available or not based on their isCheckedOut condition
      * */
     public static void bookAvailableTag(Book book){
-        if (book.isCheckedOut() == true){
+        if (!(book.getCheckedOutBy() == 0)){
             System.out.println("Currently Not Available");
         } else {
             System.out.println("Currently Available");
@@ -324,7 +339,7 @@ public class Main {
         //Traverse DB/Arraylist for desired book
         for (Book desired_book : currentBookInventory){
             if (desired_book.getBookID() == id){
-                if (desired_book.isCheckedOut == true) {
+                if (!(desired_book.checkedOutBy == 0)) {
                     System.out.println("This book is currently unavailable.");
                     System.out.println("Would you like to reserve this book? y or n");
                     String input = scan.nextLine();
@@ -341,7 +356,7 @@ public class Main {
                     }
 
                 } else {
-                    desired_book.isCheckedOut = true;
+                    desired_book.checkedOutBy = student.getID();
                     student.getStudentInventory().add(desired_book);
                 }
             }
@@ -386,12 +401,12 @@ public class Main {
 
             if (!(chosenBook.equalsIgnoreCase("back"))){
                 int option = Integer.parseInt(chosenBook);
-                queryList.get(option).isCheckedOut = false;
+                queryList.get(option).checkedOutBy = 0;
 
                 // Find the matching item in the main Arraylist and update
                 for (int j = 0; j < currentBookInventory.size(); j++){
                     if (currentBookInventory.get(j).BookID == queryList.get(option).BookID){
-                        currentBookInventory.get(j).isCheckedOut = false;
+                        currentBookInventory.get(j).checkedOutBy = 0;
 
                         //Alert person who reserved and change reservedBy value to default value
                         reserveNotif(currentBookInventory.get(j).reservedBy);
@@ -555,16 +570,16 @@ class Book {
     String Author;
     String ISNnum;
     String category;
-    boolean isCheckedOut;
+    int checkedOutBy;
     int reservedBy;
 
-    public Book(String bookTitle, int BookID, String Author, String ISNnum, String category, boolean isCheckedOut,int reservedBy){
+    public Book(String bookTitle, int BookID, String Author, String ISNnum, String category, int checkedOutBy,int reservedBy){
         this.bookTitle = bookTitle;
         this.BookID = BookID;
         this.Author = Author;
         this.ISNnum = ISNnum;
         this.category = category;
-        this.isCheckedOut = isCheckedOut;
+        this.checkedOutBy = checkedOutBy;
         this.reservedBy = reservedBy;
     }
 
@@ -588,8 +603,8 @@ class Book {
         return ISNnum;
     }
 
-    public boolean isCheckedOut() {
-        return isCheckedOut;
+    public int getCheckedOutBy() {
+        return checkedOutBy;
     }
 
     public int getReservedBy() {
