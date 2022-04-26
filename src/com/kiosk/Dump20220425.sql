@@ -78,6 +78,27 @@ INSERT INTO `univmember` VALUES (900111111,'Jordan','Doe','password123',0),(9001
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+
+-- Chaz has added droptable for history 
+-- Table structure for table `history`
+--
+
+DROP TABLE IF EXISTS `history`;
+/**/
+/**/
+CREATE TABLE `history`(
+`checkdate` DATE NOT NULL,  
+`duedate`	DATE NOT NULL
+);
+
+--
+-- Dumping data for table `history`
+--
+
+LOCK TABLES `history` WRITE;
+/**/
+/**/
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
