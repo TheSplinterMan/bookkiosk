@@ -51,6 +51,32 @@ INSERT INTO `book` VALUES (1,'The Cat in the Hat','Dr. Suess','978-0-7172-6059-1
 UNLOCK TABLES;
 
 --
+-- Table structure for table `history`
+--
+
+
+DROP TABLE IF EXISTS `history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `history` (
+  `historyID` int NOT NULL DEFAULT '0',
+  `checkdate` date NOT NULL,
+  `duedate` date NOT NULL,
+  PRIMARY KEY (`historyID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `history`
+--
+
+LOCK TABLES `history` WRITE;
+/*!40000 ALTER TABLE `history` DISABLE KEYS */;
+INSERT INTO `history` VALUES (900222,'2020-01-27','2020-12-01');
+/*!40000 ALTER TABLE `history` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `univmember`
 --
 
@@ -78,26 +104,6 @@ INSERT INTO `univmember` VALUES (900111111,'Jordan','Doe','password123',0),(9001
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
-
--- Chaz has added droptable for history 
--- Table structure for table `history`
---
-
-DROP TABLE IF EXISTS `history`;
-/**/
-/**/
-CREATE TABLE `history`(
-`checkdate` DATE NOT NULL,  
-`duedate`	DATE NOT NULL
-);
-
---
--- Dumping data for table `history`
---
-
-LOCK TABLES `history` WRITE;
-/**/
-/**/
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
