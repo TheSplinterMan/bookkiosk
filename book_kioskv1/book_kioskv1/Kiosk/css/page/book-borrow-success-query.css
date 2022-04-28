@@ -48,9 +48,11 @@
   color: rgb(246, 246, 246);
   font-size: 26px;
   font-weight: 700;
-  margin-right: 200px;
+  margin-left: 800px;
   margin-top: -33px;
-  width:100%;
+  width:59px;
+  padding-left: 50px;
+  
   
 }
 
@@ -119,8 +121,8 @@
   font-size: 26px;
   font-weight: 700;
   height: 47px;
-  margin-left: 40px;
-  margin-top: 20px;
+  margin-left: 25px;
+  margin-top: 30px;
   width: 244px;
 }
 
