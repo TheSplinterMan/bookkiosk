@@ -188,7 +188,7 @@ hr {
   display: grid;
   min-height: 24px;
   justify-content: center;
-  align-items: flex-end;
+  /*align-items: flex-end;*/
   justify-items: start;
 }
 
