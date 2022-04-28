@@ -48,9 +48,10 @@
   color: rgb(246, 246, 246);
   font-size: 26px;
   font-weight: 700;
-  margin-left: 315px;
+  margin-right: 200px;
   margin-top: -33px;
-  width: 78px;
+  width:100%;
+  
 }
 
 .e063kxsr {
@@ -147,7 +148,8 @@
   color: rgb(246, 246, 246);
   font-size: 22px;
   font-weight: 700;
-  margin-left: 50px;
-  margin-top: 13px;
-  width: 44px;
+  margin-left: 1px;
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
 }
